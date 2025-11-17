@@ -4,18 +4,16 @@ import random
 
 # get image
 background = pygame.image.load("background.jpg")
+background = pygame.transform.scale(background, (600, 600))
+background_y = 0  # keep track of where the bg is at
+background2_y = -600  # keep track of where the bg is at
+
+
+# get our car image
+mycar = pygame.image.load("car.png")  # new
 
 
 tileandparent = {(0, 0): None}
-
-
-def findpath(target_tile):
-    path = []  # tracks the tiles we need to follow
-    current_tile = target_tile
-    while current_tile is not None:
-        path.append(current_tile)
-        current_tile = tileandparent[current_tile]  # what is your parent
-    return path
 
 
 screenwidth = 600
@@ -24,20 +22,35 @@ screenheight = 600
 gamescreen = pygame.display.set_mode((screenwidth, screenheight))
 
 # car details
-carwidth = 300
-carheight = 300
+carwidth = 50
+carheight = 50
 carpositionx = screenwidth / 2
-carpositiony = 700
+carpositiony = 500
 # enemy details
 enemy1_positionx = screenwidth / 2  # center
 enemy1_positiony = 10  # near the top
 enemy_speed = 0.09
 
 
+# adding sounds
+pygame.mixer.init()  # prepares our game to load some sounds
+#background_music = pygame.mixer.music.load("the sound we will download")
+#pygame.mixer.music.set_volume(0.5)
+#pygame.mixer.music.play()
+
+
 # forever block
 while True:
+    background_y += 0.7
+    background2_y += 0.7
+
+    if background_y > 600:
+        background_y = -600
+    if background2_y > 600:
+        background2_y = -600
+
     # move enemies
-    enemy1_positiony += 0.3
+    enemy1_positiony += 0.7
     if enemy1_positiony > 800:
         enemy1_positiony = 0
         chosen_number = random.randint(0, screenwidth)  # new
@@ -52,18 +65,20 @@ while True:
         exit()  # stop the game
 
     gamescreen.fill((0, 200, 0))
-    gamescreen.blit(background, (0, 0))
+    gamescreen.blit(background, (0, background_y))
+    gamescreen.blit(background, (0, background2_y))
+    gamescreen.blit(mycar, (carpositionx, carpositiony))
+    gamescreen.blit(mycar, (0, enemy1_positiony))
+    pygame.draw.rect(
+        gamescreen,
+        (100, 0, 0),
+        pygame.Rect(carpositionx, carpositiony, carwidth, carheight),
+    )
     # draw enemies
     pygame.draw.rect(
         gamescreen,
         (50, 50, 50),
         pygame.Rect(enemy1_positionx, enemy1_positiony, 50, 50),
-    )
-
-    pygame.draw.rect(
-        gamescreen,
-        (100, 0, 0),
-        pygame.Rect(carpositionx, carpositiony, carwidth, carheight),
     )
 
     pygame.display.flip()  # tells pygame we are done drawing
